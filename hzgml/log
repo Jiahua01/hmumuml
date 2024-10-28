@@ -1,0 +1,5 @@
+python scripts/train_bdt.py -r two_jet --save
+
+python scripts/apply_bdt.py -r two_jet
+
+python scripts/categorization_1D.py -r two_jet -b 10

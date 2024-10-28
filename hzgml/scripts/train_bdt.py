@@ -31,7 +31,7 @@ def getArgs():
     parser.add_argument('-p', '--params', action='store', type=dict, default=None, help='json string.') #type=json.loads
     parser.add_argument('--hyperparams_path', action='store', default=None, help='path of hyperparameters json') 
     parser.add_argument('--save', action='store_true', help='Save model weights to HDF5 file')
-    parser.add_argument('--corr', action='store_true', default=False, help='Plot corelation between each training variables')
+    parser.add_argument('--corr', action='store_true', default=True, help='Plot corelation between each training variables')
     parser.add_argument('--importance', action='store_true', default=True, help='Plot importance of variables, parameter "gain" is recommanded')
     parser.add_argument('--roc', action='store_true', default=True, help='Plot ROC')
     parser.add_argument('--skopt', action='store_true', default=False, help='Run hyperparameter tuning using skopt')
@@ -69,7 +69,7 @@ class XGBoostHandler(object):
 
         self._region = region
 
-        self._inputFolder = '/eos/user/j/jiahua/vbfhmm/mlfile'
+        self._inputFolder = '/eos/user/j/jiahua/vbfhmm/MC_guo/mlfile'
         self._outputFolder = 'models'
         self._chunksize = 500000
         self._branches = []
@@ -321,7 +321,7 @@ class XGBoostHandler(object):
         else:
             data = self.m_data_bkg
         columns = list(data.columns)
-        for rem in ("is_vbfhmm", "weight", "event"):
+        for rem in ("is_vbfhmm", "weight", "event","trg_single_mu24","H_mass<=150","H_mass>=110"):
             if rem in columns:
                 columns.remove(rem)
                 data = data.drop(rem, axis=1)

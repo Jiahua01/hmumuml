@@ -22,9 +22,9 @@ def getArgs():
     """Get arguments from command line."""
     parser = ArgumentParser()
     parser.add_argument('-c', '--config', action='store', nargs=2, default=['data/training_config_BDT.json', 'data/apply_config_BDT.json'], help='Region to process')
-    parser.add_argument('-i', '--inputFolder', action='store', default='/eos/user/j/jiahua/vbfhmm/mlfile', help='directory of training inputs')
+    parser.add_argument('-i', '--inputFolder', action='store', default='/eos/user/j/jiahua/vbfhmm/MC_guo/mlfile', help='directory of training inputs')
     parser.add_argument('-m', '--modelFolder', action='store', default='models', help='directory of BDT models')
-    parser.add_argument('-o', '--outputFolder', action='store', default='/eos/user/j/jiahua/vbfhmm/mlfile/outputs', help='directory for outputs')
+    parser.add_argument('-o', '--outputFolder', action='store', default='/eos/user/j/jiahua/vbfhmm/MC_guo/outputs', help='directory for outputs')
     parser.add_argument('-r', '--region', action='store', choices=['two_jet', 'one_jet', 'zero_jet', 'zero_to_one_jet', 'VH_ttH', 'all_jet'], default='two_jet', help='Region to process')
     parser.add_argument('-cat', '--category', action='store', nargs='+', help='apply only for specific categories')
 
@@ -249,6 +249,7 @@ class ApplyXGBHandler(object):
 
                         data_s = data[data[self.randomIndex]%4 == i]
                         data_o = data_s[outputbraches]
+                        data_s.loc[((data_s["H_mass"]<115) & (data_s["H_mass"]>110) | (data_s["H_mass"]>135) & (data_s["H_mass"]<150)), "H_mass"] = 125
 
                         for model in self.train_variables.keys():
                             x_Events = data_s[self.train_variables[model]]

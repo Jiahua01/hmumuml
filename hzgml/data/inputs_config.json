@@ -1,4 +1,8 @@
-{"sample_list": {"dy105":  ["two_jet_run2"],
-                 "dy50":   ["two_jet_run2"],
+{"sample_list": {"dy":  ["two_jet_run2"],
+                 "ewk":   ["two_jet_run2"],
+                 "diboson":   ["two_jet_run2"],
+                 "triboson":   ["two_jet_run2"],
+                 "top":   ["two_jet_run2"],
                  "data":   ["two_jet_run2"],
+                 "ggh":  ["two_jet_run2"],
                  "vbf":    ["two_jet_run2"]}}

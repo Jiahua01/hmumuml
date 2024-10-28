@@ -27,7 +27,7 @@ def getArgs():
     """Get arguments from command line."""
     parser = ArgumentParser()
     parser.add_argument('-r', '--region', action = 'store', choices = ['all_jet', 'two_jet', 'one_jet', 'zero_jet', 'zero_to_one_jet', 'VH_ttH'], default = 'two_jet', help = 'Region to process')
-    parser.add_argument('-i', '--input', action = 'store', default = '/eos/user/j/jiahua/vbfhmm/mlfile/outputs', help = 'Path of root file for categorization')
+    parser.add_argument('-i', '--input', action = 'store', default = '/eos/user/j/jiahua/vbfhmm/MC_guo/outputs', help = 'Path of root file for categorization')
     parser.add_argument('-n', '--nscan', type = int, default = 100, help='number of scan.')
     parser.add_argument('-b', '--nbin', type = int, default = 10, choices = [1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,16], help = 'number of BDT bins.')
     parser.add_argument('--skip', action = 'store_true', default = False, help = 'skip the hadd part')
@@ -36,7 +36,7 @@ def getArgs():
     #parser.add_argument('--val', action = 'store_true', default = False, help = 'se validation samples for categroization')
     parser.add_argument('-t', '--transform', type = bool, default = True, help = 'use the transform scores for categroization')
     parser.add_argument('--floatB', action = 'store_true', default = False, help = 'Floting last boundary')
-    parser.add_argument('-es', '--estimate', action = 'store', choices = ['fullSim', 'fullSimrw', 'data_sid'], default = 'fullSimrw', help = 'Method to estimate significance')
+    parser.add_argument('-es', '--estimate', action = 'store', choices = ['fullSim', 'fullSimrw', 'data_sid'], default = 'fullSim', help = 'Method to estimate significance')
 
     parser.add_argument('-f', '--nfold', type = int, default = 1, help='number of folds.')
     parser.add_argument('-e', '--earlystop', type = int, default = -1, help='early stopping rounds.')
@@ -62,10 +62,10 @@ def gettingsig(input_path, region, variable, boundaries, transform, estimate):
                           'bkgmc_cen_err': [0.]*nbin,
                           'vbf': [0.]*nbin,
                           'vbf_err': [0.]*nbin,
-                          'ggH': [0.]*nbin,
-                          'ggH_err': [0.]*nbin})
+                          'ggh': [0.]*nbin,
+                          'ggh_err': [0.]*nbin})
 
-    for category in ['sig', 'vbf', "data_sid", "bkgmc_sid", "bkgmc_cen", "sig_tot"]:#['sig', 'vbf', 'ggH', "data_sid", "bkgmc_sid", "bkgmc_cen", "sig_tot"]
+    for category in ['sig', 'vbf', "ggh", "data_sid", "bkgmc_sid", "bkgmc_cen", "sig_tot"]:#['sig', 'vbf', 'ggH', "data_sid", "bkgmc_sid", "bkgmc_cen", "sig_tot"]
         # for data in tqdm(read_root(f'{input_path}/{region}/{"bkgmc" if "bkgmc" in category else "data" if "data" in category else "sig" if "sig" in category else category}.root', key='test', columns=[f"{variable}_score{'_t' if transform else ''}", 'H_mass', 'weight', 'event'], chunksize=500000), desc=f'Loading {category}', bar_format='{desc}: {percentage:3.0f}%|{bar:20}{r_bar}'):
         # Define the file path
         file_path = f'{input_path}/{region}/{"bkgmc" if "bkgmc" in category else "data" if "data" in category else "sig" if "sig" in category else category}.root'
@@ -143,18 +143,18 @@ def categorizing(input_path, region, variable, sigs, bkgs, nscan, minN, transfor
     h_sig = TH1F('h_sig','h_sig',nscan,0,1)
     h_bkg = TH1F('h_bkg','h_bkg',nscan,0,1)
 
-    t_sig.Draw(f"{variable}_score{'_t' if transform else ''}>>h_sig", "weight*%f*((H_mass>=122&&H_mass<=128)&&(event%%%d!=%d))"%(n_fold/(n_fold-1.) if n_fold != 1 else 1, n_fold, fold if n_fold != 1 else 1))
+    t_sig.Draw(f"{variable}_score{'_t' if transform else ''}>>h_sig", "weight*%f*((H_mass>=115&&H_mass<=135)&&(event%%%d!=%d))"%(n_fold/(n_fold-1.) if n_fold != 1 else 1, n_fold, fold if n_fold != 1 else 1))
 
     # filling bkg histograms
     if estimate in ["fullSim", "fullSimrw"]:
         h_bkgmc_cen = TH1F('h_bkgmc_cen', 'h_bkgmc_cen', nscan, 0., 1.)
-        t_bkgmc.Draw(f"{variable}_score{'_t' if transform else ''}>>h_bkgmc_cen", "weight*%f*((H_mass>=122&&H_mass<=128)&&(event%%%d!=%d))"%(n_fold/(n_fold-1.) if n_fold != 1 else 1, n_fold, fold if n_fold != 1 else 1))
+        t_bkgmc.Draw(f"{variable}_score{'_t' if transform else ''}>>h_bkgmc_cen", "weight*%f*((H_mass>=115&&H_mass<=135)&&(event%%%d!=%d))"%(n_fold/(n_fold-1.) if n_fold != 1 else 1, n_fold, fold if n_fold != 1 else 1))
     if estimate in ["fullSimrw"]:
         h_bkgmc_sid = TH1F('h_bkgmc_sid', 'h_bkgmc_sid', nscan, 0., 1.)
-        t_bkgmc.Draw(f"{variable}_score{'_t' if transform else ''}>>h_bkgmc_sid", "weight*%f*((H_mass>=100&&H_mass<=180)&&!(H_mass>=122&&H_mass<=128)&&(event%%%d!=%d))"%(n_fold/(n_fold-1.) if n_fold != 1 else 1, n_fold, fold if n_fold != 1 else 1))
+        t_bkgmc.Draw(f"{variable}_score{'_t' if transform else ''}>>h_bkgmc_sid", "weight*%f*((H_mass>=110&&H_mass<=150)&&!(H_mass>=115&&H_mass<=135)&&(event%%%d!=%d))"%(n_fold/(n_fold-1.) if n_fold != 1 else 1, n_fold, fold if n_fold != 1 else 1))
     if estimate in ["fullSimrw", "data_sid"]:
         h_data_sid = TH1F('h_data_sid', 'h_data_sid', nscan, 0., 1.)
-        t_data_sid.Draw(f"{variable}_score{'_t' if transform else ''}>>h_data_sid", "weight*%f*((H_mass>=100&&H_mass<=180)&&!(H_mass>=122&&H_mass<=128)&&(event%%%d!=%d))"%(n_fold/(n_fold-1.) if n_fold != 1 else 1, n_fold, fold if n_fold != 1 else 1))
+        t_data_sid.Draw(f"{variable}_score{'_t' if transform else ''}>>h_data_sid", "weight*%f*((H_mass>=110&&H_mass<=150)&&!(H_mass>=115&&H_mass<=135)&&(event%%%d!=%d))"%(n_fold/(n_fold-1.) if n_fold != 1 else 1, n_fold, fold if n_fold != 1 else 1))
 
     if estimate == "data_sid":
         h_data_sid.Scale(0.20)
@@ -189,10 +189,10 @@ def main():
 
     input_path = args.input
 
-    sigs = ["vbf"]
+    sigs = ["vbf","ggh"]#,"ggh"
 
     # bkgs = ['data_fake', 'mc_med', 'mc_true']
-    bkgs = ["dy50"]
+    bkgs = ["dy","ewk","top","diboson","triboson"]#,"triboson","diboson"
     if args.floatB and args.nbin == 16:
         print('ERROR: With floatB option, the maximun nbin is 15!!')
         quit()
